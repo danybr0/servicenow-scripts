@@ -6,6 +6,16 @@ while (target.next()) {
   // add code here to process the incident record 
 }
 
+// UPDATE RITM / SRQ
+var gr = new GlideRecord('sc_req_item');
+gr.addQuery('number', 'RITM0040224'); // ritm number
+gr.query();
+if(gr.next()) {
+   gr.state = '8';
+   gr.update();
+}
+
+
 // UPDATE CHANGE TASK
 var gr = new GlideRecord('change_task');
 gr.addQuery('number', 'CTASK0111702');
