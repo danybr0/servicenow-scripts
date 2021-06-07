@@ -119,6 +119,19 @@ while(grt.next()) {
 	}
 }
 
+// CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST
+var gr = new GlideRecord('change_task');
+	gr.addQuery('change_request', '4e2b3e895f7e289864d574a460069cdd');
+        gr.addEncodedQuery('stateIN-5,1,2');
+        gr.orderBy('order');
+	gr.query();
+        gs.log('change task count is: ' +  gr.getRowCount());
+	while(gr.next()) {
+        gs.log(gr.number + '\n');
+        gr.state = '4';
+        gr.update();
+}
+
 // CANCEL CHANGE TASKS FOR MULTIPLE CHANGE REQUESTS
 var change_arr = ['CHG0040003', 'CHG0040005', 'CHG0040006']; //Iterate through the changes that need their change tasks to be cancelled
 
