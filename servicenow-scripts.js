@@ -153,6 +153,24 @@ var gr = new GlideRecord('change_task');
         gr.update();
 }
 
+// CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST (+ value WORK START AND WORK END)
+var gr = new GlideRecord('change_task');
+	gr.addQuery('change_request', '3e3d586a5f4d74dc64d574a460069cab');
+        gr.addEncodedQuery('stateIN-5,1,2');
+        gr.orderBy('order');
+	gr.query();
+        gs.log('change task count is: ' +  gr.getRowCount());
+	while(gr.next()) {
+		var date = new GlideDateTime();
+		var newdate = date.getDisplayValue();
+        	gs.log(gr.number + '\n');
+                gs.log('new date is: ' +  newdate);
+        	gr.state = '3';
+        	gr.work_start = newdate;
+                gr.work_end = newdate;
+                gr.update();
+}
+
 // CANCEL CHANGE TASKS FOR MULTIPLE CHANGE REQUESTS
 var change_arr = ['CHG0040003', 'CHG0040005', 'CHG0040006']; //Iterate through the changes that need their change tasks to be cancelled
 
