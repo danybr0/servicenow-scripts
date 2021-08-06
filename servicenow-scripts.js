@@ -199,5 +199,19 @@ function getSysid(num){
 		return '';
 }
 
-
+// STATE TO CLOSED for INCIDENTs older than 30 days for specyfic assgnment group
+var grIncident = new GlideRecord('incident');
+grIncident.addQuery('active','true');
+grIncident.addQuery("sys_created_onRELATIVELE@dayofweek@ago@30");              // specifying the date of creation of incidents on which the script is to run
+grIncident.addQuery('contact_type','event_management');                        // specyfic contact type
+grIncident.addQuery('assignment_group','30d97d97c7de770064d5f293ef227935');    // specyfic assignment group
+grIncident.addQuery('stateIN111,110,1');                                       // specyfying states
+grIncident.orderBy('order');
+grIncident.query();
+while (grIncident.next()) {
+    grIncident.state = '7'; // 7 - closed
+    grIncident.close_code = 'Not Solved (Not Reproducible)';
+    grIncident.close_notes = 'State automatically changed to Closed - Incident older than 30 days';
+    grIncident.update();
+}
 
