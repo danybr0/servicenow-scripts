@@ -153,6 +153,23 @@ var gr = new GlideRecord('change_task');
         gr.update();
 }
 
+// CLOSE CHANGE TASKS FOR A SINGLE CHANGE REQUEST
+var gr = new GlideRecord('change_task');
+    gr.addQuery('change_request', '1c4064495f037c9064d574a460069ce5'); // sys_id
+    gr.addEncodedQuery('stateIN-5,1,2');
+    gr.orderBy('order');
+    gr.query();
+    gs.log('change task count is: ' +  gr.getRowCount());
+    while(gr.next()) {
+        var date = new GlideDateTime();
+        var newdate = date.getDisplayValue();
+        gs.log(gr.number + '\n');   
+        gs.log('new date is: ' +  newdate);        
+	gr.state = '3';
+        gr.work_end = newdate;
+        gr.update();
+}
+
 // CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST (+ value WORK START AND WORK END)
 var gr = new GlideRecord('change_task');
 	gr.addQuery('change_request', '3e3d586a5f4d74dc64d574a460069cab');
