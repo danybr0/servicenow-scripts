@@ -217,4 +217,15 @@ function getSysid(num){
 }
 
 
+// DELETE MULTIPLE RECORDS 
+// e.g. delete multiple records of departments that have been created TODAY
+var gr = new GlideRecord('cmn_department');
+gr.addEncodedQuery('sys_created_onONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()');
+gr.query();
+
+gs.log('Number of depts deleted: ' +  gr.getRowCount());
+
+while (gr.next()) {
+   gr.deleteMultiple();
+}
 
