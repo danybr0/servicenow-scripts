@@ -1,3 +1,11 @@
+// GET the the value of a field
+// For regular forms, use this:
+var disp = g_form.getDisplayBox("field_name").value;
+// In the Service Catalog, you may have to use this instead:
+var varDisp = g_form.getDisplayBox(g_form.resolveNameMap("variable_name")).value;
+
+///////////////////////// GLIDERECORD SCRIPTS
+
 // example
 var target = new GlideRecord('incident'); 
 target.addQuery('priority',1);
@@ -5,13 +13,6 @@ target.query(); // Issue the query to the database to get relevant records
 while (target.next()) { 
   // add code here to process the incident record 
 }
-
-// display value of a field
-// For regular forms, use this:
-var disp = g_form.getDisplayBox("field_name").value;
-// In the Service Catalog, you may have to use this instead:
-var varDisp = g_form.getDisplayBox(g_form.resolveNameMap("variable_name")).value;
-
 
 // UPDATE RITM / SRQ
 var gr = new GlideRecord('sc_req_item');
