@@ -6,6 +6,13 @@ while (target.next()) {
   // add code here to process the incident record 
 }
 
+// display value of a field
+// For regular forms, use this:
+var disp = g_form.getDisplayBox("field_name").value;
+// In the Service Catalog, you may have to use this instead:
+var varDisp = g_form.getDisplayBox(g_form.resolveNameMap("variable_name")).value;
+
+
 // UPDATE RITM / SRQ
 var gr = new GlideRecord('sc_req_item');
 gr.addQuery('number', 'RITM0040224'); // ritm number
