@@ -224,6 +224,19 @@ function getSysid(num){
 		return '';
 }
 
+// UPDATE CS1511348 to state 7 (cancelled) 
+var gr = new GlideRecord('sn_customerservice_case');
+gr.addEncodedQuery('active=true^state=10^number=CS1511348');
+gr.query();
+
+gs.log('Number of cases: ' +  gr.getRowCount());
+gs.log('Case number: ' + gr.number());
+
+if (gr.next()) {
+    gs.log(gr.number + '\n');   
+    gr.state = '7';
+    gr.update();
+}
 
 // DELETE MULTIPLE RECORDS 
 // e.g. delete multiple records of departments that have been created TODAY
