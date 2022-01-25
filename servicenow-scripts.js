@@ -237,6 +237,21 @@ if (gr.next()) {
     gr.state = '7';
     gr.update();
 }
+	
+// CLOSE active RITMS that are Closed Complete state
+closeItems();
+function closeItems(){
+	var str = "state=3^active=true";
+	var req = new GlideRecord('sc_req_item');
+	req.addEncodedQuery(str);
+	req.query();
+	while(req.next()){
+		req.active = false;
+		req.setWorkflow(false);
+		req.update();
+	}
+}
+// source: https://community.servicenow.com/community?id=community_question&sys_id=78265421dbec44dc0be6a345ca9619d3&view_source=searchResult
 
 // DELETE MULTIPLE RECORDS 
 // e.g. delete multiple records of departments that have been created TODAY
