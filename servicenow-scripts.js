@@ -14,6 +14,26 @@ while (target.next()) {
   // add code here to process the incident record 
 }
 
+// CANCEL CASES 
+cancelCases();
+function cancelCases(){
+	var gr = new GlideRecord('sn_customerservice_case');
+	    gr.addEncodedQuery('sys_created_byLIKEadmindcv^state=1');
+	    gr.orderBy('order');
+	    gr.query();
+	    gs.log('Cases count are: ' +  gr.getRowCount() + '\n');
+	    while(gr.next()) {
+		var date = new GlideDateTime();
+		var newdate = date.getDisplayValue();
+		gs.log(gr.number);   
+		gs.log('new date is: ' +  newdate + '\n');        
+		    gr.state = '7';
+		// gr.work_end = newdate;
+		gr.update();
+	}
+}
+
+
 // Bulk amendment of a specific SLA Definition
 
 // REQUIREMENTS
