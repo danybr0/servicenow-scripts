@@ -14,6 +14,56 @@ while (target.next()) {
   // add code here to process the incident record 
 }
 
+// Bulk amendment of a specific SLA Definition
+
+// REQUIREMENTS
+// 1) Start condition: ADD 'Incident state is not Cancelled';  'Not Customer visible ticket is false', 'Reason Code is not one of: Time Registration, Ticket created by mistake,  Ticket created to test, Ticket is a duplicate'
+// Other conditions that are already in Start Conditions should not be changed/overwritten (e.g. Priority). Some of SLA Definitions may already have some of the above, e.g. "Incident state is not Cancelled'
+// 2) Stop condition: CHANGE to 'Incident state is one of: Resolved, Closed' ('Cancelled' should be removed from this condition). Some definitions may have it setup properly already.
+// 3) Reset Condition: ADD "Contract.Availability report on is: Business Service AND Business Service changes OR All of these conditions must be met Contract.Availability report on is Configuration Item AND Confoiguration Item changes"
+// Some definitions may have it setup properly already.
+
+// CODE
+updateCI();
+function updateCI(){
+var name = 'FPI Test Down Time 2';
+    var csla = new GlideRecord('contract_sla');
+    csla.addQuery('name','=', name);
+    // csla.addQuery('sys_id', '35420982d732220035ae23c7ce610393');
+    csla.query();
+    gs.print('grCI Query: ' +  csla.getEncodedQuery() + ' = ' +   csla.getRowCount());
+
+    while (csla.next()) {
+        // start condition
+        if (csla.start_condition.includes("incident_state!=8")) { 
+	// CREATING Not Customer visible ticket is false CONDITION
+            csla.start_condition = csla.start_condition + '^u_internal=false';
+	    // CREATING Reason Code is not one of: Time Registration, Ticket created by mistake, Ticket created to test, Ticket is a duplicate CONDITION
+	    // CODE LINE NOT WORKING
+            csla.start_condition = csla.start_condition + '^u_reason_codeNOTINTime Registration,Ticket created by mistake,Ticket created to test,Ticket is a duplicate';
+        } else { // create above conditions + Incident state is not Cancelled CONDITION
+            // csla.start_condition = csla.start_condition + '^incident_state!=8';
+            csla.start_condition = csla.start_condition + '^u_internal=false';
+	    // CODE LINE NOT WORKING
+            csla.start_condition = csla.start_condition + '^u_reason_codeNOTINTime Registration,Ticket created by mistake,Ticket created to test,Ticket is a duplicate';
+        }
+
+        // stop condition
+        var str = 'IN6,7,8';
+        if (csla.stop_condition.incident_state == str) {
+            csla.stop_condition = csla.stop_condition + '^incident_stateIN6,7'; // create new condition
+        } else {
+	    // if (csla.stop_condition.incident_state == 'IN10') {
+	    // csla.stop_condition = csla.stop_condition.replace('IN10','IN6,7'); // updating existing condition
+	    // }
+            csla.stop_condition = csla.stop_condition.replace('IN6,7,8','IN6,7'); // updating existing condition
+        } 
+
+        csla.update();
+
+    }
+}
+
 // UPDATE RITM / SRQ
 var gr = new GlideRecord('sc_req_item');
 gr.addQuery('number', 'RITM0040224'); // ritm number
