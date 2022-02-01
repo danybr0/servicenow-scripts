@@ -1,10 +1,9 @@
-// GET the the value of a field
-// For regular forms, use this:
-var disp = g_form.getDisplayBox("field_name").value;
-// In the Service Catalog, you may have to use this instead:
-var varDisp = g_form.getDisplayBox(g_form.resolveNameMap("variable_name")).value;
 
-///////////////////////// GLIDERECORD SCRIPTS
+
+///////////////////////// GLIDERECORD SCRIPTS /////////////////////////
+
+
+///====================== RECORD QUERIES ===========================///
 
 // example
 var target = new GlideRecord('incident'); 
@@ -14,7 +13,39 @@ while (target.next()) {
   // add code here to process the incident record 
 }
 
-// CANCEL CASES 
+
+///---------------------- GET FIELD VALUE --------------------------///
+// For regular forms, use this:
+var disp = g_form.getDisplayBox("field_name").value;
+// In the Service Catalog, you may have to use this instead:
+var varDisp = g_form.getDisplayBox(g_form.resolveNameMap("variable_name")).value;
+
+
+///---------------------- ACTIVE REQUESTS WITHOUT REQUESTED ITEMS --------------------///
+(function() {
+        var grRequest = new GlideRecord("sc_request");
+        grRequest.addEncodedQuery("active=true");
+        grRequest.query();
+        gs.print('Active Requests without Requested Items :(');
+        while (grRequest.next()) {
+                var gaRequestedItem = new GlideAggregate("sc_req_item");
+                gaRequestedItem.addQuery("request",grRequest.sys_id);
+                gaRequestedItem.addAggregate('COUNT');
+                gaRequestedItem.query();
+                var req = 0;
+                if (gaRequestedItem.next()) {
+                req = gaRequestedItem.getAggregate('COUNT');
+                if (req == 0) 
+                gs.print(grRequest.number + " | " + grRequest.opened_by.name + " | " + grRequest.opened_at);
+                }
+        }
+})();
+
+
+///====================== RECORD UPDATES ===========================///
+
+
+///---------------------- CANCEL CASES  ---------------------------///
 cancelCases();
 function cancelCases(){
 	var gr = new GlideRecord('sn_customerservice_case');
@@ -34,7 +65,7 @@ function cancelCases(){
 }
 
 
-// Bulk amendment of a specific SLA Definition
+///---------------------- Bulk amendment of a specific SLA Definition ---------------------------///
 
 // REQUIREMENTS
 // 1) Start condition: ADD 'Incident state is not Cancelled';  'Not Customer visible ticket is false', 'Reason Code is not one of: Time Registration, Ticket created by mistake,  Ticket created to test, Ticket is a duplicate'
@@ -84,38 +115,43 @@ var name = 'FPI Test Down Time 2';
     }
 }
 
-// UPDATE RITM / SRQ
+
+///---------------------- CANCEL RITM / SRQ ---------------------------///
+
 var gr = new GlideRecord('sc_req_item');
 gr.addQuery('number', 'RITM0040224'); // ritm number
 gr.query();
 if(gr.next()) {
-   gr.state = '8';
-   gr.update();
+	gr.state = '8';
+	gr.update();
 }
 
 
-//  Change Closure Code in Change Request
+///---------------------- Change Closure Code in Change Request ---------------------------///
+
 var gr = new GlideRecord('change_request');
 gr.addQuery('number', 'CHG0069215');
 gr.query();
-
 while(gr.next()){
-gr.u_qs_closure_code = '5';
-gr.update();
+	gr.u_qs_closure_code = '5';
+	gr.update();
 } 
 
 
-// CHANGE STATE IN CHANGE REQUEST 
+///---------------------- CANCEL CHANGE REQUEST ---------------------------///
+ 
 var gr = new GlideRecord('change_request');
 gr.addQuery('number', 'CHG0042583');
 gr.query();
 if(gr.next()) {
-   gr.state = '308';          //308 CANCELLED
+   gr.state = '308'; //308 CANCELLED
    gr.update();
 }
 
 
-// UPDATE CHANGE TASK
+///---------------------- CANCEL CHANGE TASK ---------------------------///
+
+// ex. 1)
 var gr = new GlideRecord('change_task');
 gr.addQuery('number', 'CTASK0111702');
 gr.query();
@@ -124,7 +160,7 @@ if(gr.next()) {
    gr.update();
 }
 
-// UPDATE CHANGE TASK EX2
+// ex. 2)
 if(current.number == 4){
 	var gr = new GlideRecord('change_task');
 	gr.addQuery('change_request.number', current.number); // g_form.GetValue only works on client scripts and br's run on the server.. so you can't use g_form, instead use current.number
@@ -136,7 +172,8 @@ if(current.number == 4){
 }
 
 
-// CREATE CHANGE TASKS FOR A SINGLE CHANGE REQUEST
+///---------------------- CREATE CHANGE TASKS FOR A SINGLE CHANGE REQUEST ---------------------------///
+
 var gr = new GlideRecord('change_task');
 // Create first change_task for each of the changes listed in the above array
 gr.addQuery('change_request', '1c87925347c12200e0ef563dbb9a7177');
@@ -165,7 +202,8 @@ gr.assignment_group = 'Change Management';
 gr.insert();
 
 
-// CREATE CHANGE TASKS FOR MULTIPLE CHANGE REQUESTS
+///---------------------- CREATE CHANGE TASKS FOR MULTIPLE CHANGE REQUESTS ---------------------------///
+
 var change_arr = ['CHG0040005', 'CHG0040006']; //Iterate through the changes that need these new change tasks
 
 for (var i=0; i < change_arr.length; i++){
@@ -207,7 +245,10 @@ function getSysid(num){
 		return '';
 }
 
-// CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST
+
+///---------------------- CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST ---------------------------///
+
+// ex. 1)
 var grt = new GlideRecord('change_task');
 grt.addQuery('change_request', 'eaf5d21347c12200e0ef563dbb9a7109');
 grt.query();
@@ -218,7 +259,7 @@ while(grt.next()) {
 	}
 }
 
-// CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST
+// ex. 2)
 var gr = new GlideRecord('change_task');
 	gr.addQuery('change_request', '4e2b3e895f7e289864d574a460069cdd');
         gr.addEncodedQuery('stateIN-5,1,2');
@@ -231,24 +272,9 @@ var gr = new GlideRecord('change_task');
         gr.update();
 }
 
-// CLOSE CHANGE TASKS FOR A SINGLE CHANGE REQUEST
-var gr = new GlideRecord('change_task');
-    gr.addQuery('change_request', '1c4064495f037c9064d574a460069ce5'); // sys_id
-    gr.addEncodedQuery('stateIN-5,1,2');
-    gr.orderBy('order');
-    gr.query();
-    gs.log('change task count is: ' +  gr.getRowCount());
-    while(gr.next()) {
-        var date = new GlideDateTime();
-        var newdate = date.getDisplayValue();
-        gs.log(gr.number + '\n');   
-        gs.log('new date is: ' +  newdate);        
-	gr.state = '3';
-        gr.work_end = newdate;
-        gr.update();
-}
 
-// CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST (+ value WORK START AND WORK END)
+///---------------------- CLOSE CHANGE TASKS FOR A SINGLE CHANGE REQUEST ---------------------------///
+
 var gr = new GlideRecord('change_task');
 	gr.addQuery('change_request', '3e3d586a5f4d74dc64d574a460069cab');
         gr.addEncodedQuery('stateIN-5,1,2');
@@ -266,7 +292,9 @@ var gr = new GlideRecord('change_task');
                 gr.update();
 }
 
-// CANCEL CHANGE TASKS FOR MULTIPLE CHANGE REQUESTS
+
+///---------------------- CANCEL CHANGE TASKS FOR MULTIPLE CHANGE REQUESTS ---------------------------///
+
 var change_arr = ['CHG0040003', 'CHG0040005', 'CHG0040006']; //Iterate through the changes that need their change tasks to be cancelled
 
 for (var i=0; i < change_arr.length; i++){
@@ -294,21 +322,23 @@ function getSysid(num){
 		return '';
 }
 
-// UPDATE CS1511348 to state 7 (cancelled) 
+
+///---------------------- CANCEL CASE CS1511348 ---------------------------///
+
 var gr = new GlideRecord('sn_customerservice_case');
 gr.addEncodedQuery('active=true^state=10^number=CS1511348');
 gr.query();
-
 gs.log('Number of cases: ' +  gr.getRowCount());
 gs.log('Case number: ' + gr.number());
-
 if (gr.next()) {
     gs.log(gr.number + '\n');   
     gr.state = '7';
     gr.update();
 }
 	
-// CLOSE active RITMS that are Closed Complete state
+
+///---------------------- CLOSE ACTIVE RITMS THAT ARE CLOSED COMPLETE ---------------------------///
+
 closeItems();
 function closeItems(){
 	var str = "state=3^active=true";
@@ -323,15 +353,15 @@ function closeItems(){
 }
 // source: https://community.servicenow.com/community?id=community_question&sys_id=78265421dbec44dc0be6a345ca9619d3&view_source=searchResult
 
-// DELETE MULTIPLE RECORDS 
+
+///---------------------- DELETE MULTIPLE RECORDS ---------------------------///
+	
 // e.g. delete multiple records of departments that have been created TODAY
 var gr = new GlideRecord('cmn_department');
 gr.addEncodedQuery('sys_created_onONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()');
 gr.query();
-
 gs.log('Number of depts deleted: ' +  gr.getRowCount());
-
 while (gr.next()) {
-   gr.deleteMultiple();
+	gr.deleteMultiple();
 }
 
