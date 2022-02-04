@@ -1,9 +1,9 @@
 
 
-///////////////////////// GLIDERECORD SCRIPTS /////////////////////////
+/////////////////////////////////////////////////////////////////// GLIDERECORD SCRIPTS /////////////////////////////////////////////////////////////////////////////////
 
 
-///====================== RECORD QUERIES ===========================///
+////////////////////////////////////////////////====================== RECORD QUERIES ===========================////////////////////////////////////////////////////////
 
 // example
 var target = new GlideRecord('incident'); 
@@ -15,14 +15,34 @@ while (target.next()) {
 
 
 ///---------------------- GET FIELD VALUE --------------------------///
+
 // For regular forms, use this:
 var disp = g_form.getDisplayBox("field_name").value;
 // In the Service Catalog, you may have to use this instead:
 var varDisp = g_form.getDisplayBox(g_form.resolveNameMap("variable_name")).value;
 
 
+///---------------------- DISTINCT OPERATING SYSTEMS OF CI's --------------------------///
+
+distinctOS();
+function distinctOS() {
+        var gaServer = new GlideAggregate('cmdb_ci_server'); //GlideAggregate query
+        gaServer.addAggregate('count'); //Count aggregate (only necessary for a count of items of each OS)
+        gaServer.orderByAggregate('count'); //Count aggregate ordering
+        gaServer.groupBy('os'); //Group aggregate by the 'os' field
+        gaServer.query();
+        while(gaServer.next()){
+                var osCount = gaServer.getAggregate('count'); //Get the count of the OS group
+                //Print the OS name and count of items with that OS
+                gs.print('Distinct operating system: ' + gaServer.os + ': ' + osCount);
+        }
+}
+
+
 ///---------------------- ACTIVE REQUESTS WITHOUT REQUESTED ITEMS --------------------///
-(function() {
+
+activeRequestWithoutRITM();
+function activeRequestWithoutRITM() {
         var grRequest = new GlideRecord("sc_request");
         grRequest.addEncodedQuery("active=true");
         grRequest.query();
@@ -39,13 +59,14 @@ var varDisp = g_form.getDisplayBox(g_form.resolveNameMap("variable_name")).value
                 gs.print(grRequest.number + " | " + grRequest.opened_by.name + " | " + grRequest.opened_at);
                 }
         }
-})();
+}
 
 
-///====================== RECORD UPDATES ===========================///
+////////////////////////////////////////////////====================== RECORD UPDATES ===========================////////////////////////////////////////////////////////
 
 
 ///---------------------- CANCEL CASES  ---------------------------///
+
 cancelCases();
 function cancelCases(){
 	var gr = new GlideRecord('sn_customerservice_case');
@@ -58,7 +79,7 @@ function cancelCases(){
 		var newdate = date.getDisplayValue();
 		gs.log(gr.number);   
 		gs.log('new date is: ' +  newdate + '\n');        
-		    gr.state = '7';
+		gr.state = '7';
 		// gr.work_end = newdate;
 		gr.update();
 	}
