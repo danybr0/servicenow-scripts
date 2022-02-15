@@ -62,6 +62,29 @@ function activeRequestWithoutRITM() {
 }
 
 
+///---------------------- GET ALL CIs WITHIN ALL CLASSES ---------------------------------///
+
+getAllClasses();
+
+function getAllClasses() {
+var count = new GlideAggregate('cmdb_ci');
+count.addAggregate('COUNT', 'sys_class_name');
+count.query();
+while (count.next()) {
+                var ciClass = count.sys_class_name;
+                var classCount = count.getAggregate('COUNT', 'sys_class_name');
+                        if (classCount <= 1) {
+                                gs.log("The is currently " + classCount + " CI with a class of " + ciClass);
+                        }
+                        if (classCount > 1) {
+                                gs.log("The are currently " + classCount + " CIs with a class of " + ciClass);
+                        }
+                
+                }
+}
+
+
+
 ////////////////////////////////////////////////====================== RECORD UPDATES ===========================////////////////////////////////////////////////////////
 
 
