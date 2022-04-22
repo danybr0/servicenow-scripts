@@ -399,13 +399,18 @@ function closeItems(){
 
 
 ///---------------------- DELETE MULTIPLE RECORDS ---------------------------///
+
+// template delete multiple records 
+var grRu = new GlideRecord('u_integration_subscription');
+grRu.addEncodedQuery("your query");
+grRu.query();
+grRu.deleteMultiple();
 	
 // e.g. delete multiple records of departments that have been created TODAY
 var gr = new GlideRecord('cmn_department');
 gr.addEncodedQuery('sys_created_onONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()');
 gr.query();
 gs.log('Number of depts deleted: ' +  gr.getRowCount());
-while (gr.next()) {
-	gr.deleteMultiple();
-}
+gr.deleteMultiple();
+
 
