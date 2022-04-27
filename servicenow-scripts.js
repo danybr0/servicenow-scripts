@@ -305,11 +305,11 @@ while(grt.next()) {
 
 // ex. 2)
 var gr = new GlideRecord('change_task');
-	gr.addQuery('change_request', '4e2b3e895f7e289864d574a460069cdd');
+	gr.addQuery('change_request', '4e2b3e895f7e289864d574a460069cdd'); //paste correct sysID
         gr.addEncodedQuery('stateIN-5,1,2');
         gr.orderBy('order');
 	gr.query();
-        gs.log('change task count is: ' +  gr.getRowCount());
+        gs.log('change task count is: ' +  gr.getRowCount()); 
 	while(gr.next()) {
         gs.log(gr.number + '\n');
         gr.state = '4';
@@ -320,7 +320,7 @@ var gr = new GlideRecord('change_task');
 ///---------------------- CLOSE CHANGE TASKS FOR A SINGLE CHANGE REQUEST ---------------------------///
 
 var gr = new GlideRecord('change_task');
-	gr.addQuery('change_request', '3e3d586a5f4d74dc64d574a460069cab');
+	gr.addQuery('change_request', '3e3d586a5f4d74dc64d574a460069cab'); //paste correct sysID
         gr.addEncodedQuery('stateIN-5,1,2');
         gr.orderBy('order');
 	gr.query();
