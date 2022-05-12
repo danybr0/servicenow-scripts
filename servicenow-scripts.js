@@ -171,50 +171,54 @@ if(gr.next()) {
 }
 
 
-///---------------------- Change Closure Code in Change Request ---------------------------///
-
-var gr = new GlideRecord('change_request');
-gr.addQuery('number', 'CHG0069215');
-gr.query();
-while(gr.next()){
-	gr.u_qs_closure_code = '5';
-	gr.update();
-} 
-
-
 ///---------------------- CANCEL CHANGE REQUEST ---------------------------///
  
-var gr = new GlideRecord('change_request');
-gr.addQuery('number', 'CHG0042583');
-gr.query();
-if(gr.next()) {
-   gr.state = '308'; //308 CANCELLED
-   gr.update();
+closeCHANGE();
+function closeCHANGE(){
+    var gr = new GlideRecord('change_request');
+    gr.addQuery('sys_id', '8c4fe890c7cd811464d5f293ef22793e'); // paste correct sys_id
+    gr.query();
+    if(gr.next()) {
+        gr.state = '307'; //308 CLOSED
+        gr.update();
+    }
+}
+
+cancelCHANGE();
+function cancelCHANGE(){
+    var gr = new GlideRecord('change_request');
+    gr.addQuery('sys_id', '8c4fe890c7cd811464d5f293ef22793e'); // paste correct sys_id
+    gr.query();
+    if(gr.next()) {
+        gr.state = '308'; //308 CANCELLED
+        gr.update();
+    }
 }
 
 
-///---------------------- CANCEL CHANGE TASK ---------------------------///
+///---------------------- CLOSE/CANCEL CHANGE TASK ---------------------------///
 
-// ex. 1)
-var gr = new GlideRecord('change_task');
-gr.addQuery('number', 'CTASK0111702');
-gr.query();
-if(gr.next()) {
-   gr.state = '4';
-   gr.update();
+closeCTASK();
+function closeCTASK(){
+    var gr = new GlideRecord('change_task');
+    gr.addQuery('sys_id', '8c4fe890c7cd811464d5f293ef22793e'); // paste correct sys_id
+    gr.query();
+    if(gr.next()) {
+        gr.state = '3'; 
+        gr.update();
+    }
 }
 
-// ex. 2)
-if(current.number == 4){
-	var gr = new GlideRecord('change_task');
-	gr.addQuery('change_request.number', current.number); // g_form.GetValue only works on client scripts and br's run on the server.. so you can't use g_form, instead use current.number
-	gr.query();
-	while(gr.next()) {
-           gr.state = '4';
-           gr.update();
-	}
+cancelCTASK();
+function cancelCTASK(){
+    var gr = new GlideRecord('change_task');
+    gr.addQuery('sys_id', '8c4fe890c7cd811464d5f293ef22793e'); // paste correct sys_id
+    gr.query();
+    if(gr.next()) {
+        gr.state = '4'; 
+        gr.update();
+    }
 }
-
 
 ///---------------------- CREATE CHANGE TASKS FOR A SINGLE CHANGE REQUEST ---------------------------///
 
