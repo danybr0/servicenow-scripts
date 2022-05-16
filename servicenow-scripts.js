@@ -171,7 +171,7 @@ if(gr.next()) {
 }
 
 
-///---------------------- CANCEL CHANGE REQUEST ---------------------------///
+///---------------------- CLOSE/CANCEL CHANGE REQUEST ---------------------------///
  
 closeCHANGE();
 function closeCHANGE(){
@@ -179,7 +179,7 @@ function closeCHANGE(){
     gr.addQuery('sys_id', '8c4fe890c7cd811464d5f293ef22793e'); // paste correct sys_id
     gr.query();
     if(gr.next()) {
-        gr.state = '307'; //308 CLOSED
+        gr.state = '307'; //307 CLOSED
         gr.update();
     }
 }
@@ -196,7 +196,7 @@ function cancelCHANGE(){
 }
 
 
-///---------------------- CLOSE/CANCEL CHANGE TASK ---------------------------///
+///---------------------- CLOSE/CANCEL CTASK ---------------------------///
 
 closeCTASK();
 function closeCTASK(){
@@ -204,7 +204,8 @@ function closeCTASK(){
     gr.addQuery('sys_id', '8c4fe890c7cd811464d5f293ef22793e'); // paste correct sys_id
     gr.query();
     if(gr.next()) {
-        gr.state = '3'; 
+        gr.state = '3';
+	gr.setValue('description', 'task completed');
         gr.update();
     }
 }
