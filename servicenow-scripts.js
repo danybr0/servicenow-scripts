@@ -88,6 +88,19 @@ while (count.next()) {
 ////////////////////////////////////////////////====================== RECORD UPDATES ===========================////////////////////////////////////////////////////////
 
 
+///---------------------- REQUEST Ansible Access Roles  ---------------------------///
+
+var grUM2ARS = new GlideRecord('access_roles_servers');
+grUM2ARS.addEncodedQuery("u_state=Failed^u_server.install_status=1^u_server.u_infrastructure=false");
+grUM2ARS.query();
+//gs.print('CTasks count = '+ grUM2ARS.getRowCount());
+while (grUM2ARS.next()) {
+   gs.print(grUM2ARS.u_server + ' Change State before = '+ grUM2ARS.u_state );
+   grUM2ARS.u_state = 'Requested';       
+   gs.print(grUM2ARS.u_server + ' Change State after = '+ grUM2ARS.u_state );  
+   grUM2ARS.update();
+}
+
 ///---------------------- CANCEL CASES  ---------------------------///
 
 cancelCases();
