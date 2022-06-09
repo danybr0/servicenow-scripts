@@ -308,7 +308,7 @@ function getSysid(num){
 }
 
 
-///---------------------- CANCEL CHANGE TASKS FOR A SINGLE CHANGE REQUEST ---------------------------///
+///---------------------- CANCEL CTASKS FOR A SINGLE CHANGE REQUEST ---------------------------///
 
 // ex. 1)
 var grt = new GlideRecord('change_task');
@@ -323,15 +323,19 @@ while(grt.next()) {
 
 // ex. 2)
 var gr = new GlideRecord('change_task');
-	gr.addQuery('change_request', '4e2b3e895f7e289864d574a460069cdd'); //paste correct sysID
-        gr.addEncodedQuery('stateIN-5,1,2');
-        gr.orderBy('order');
-	gr.query();
-        gs.log('change task count is: ' +  gr.getRowCount()); 
-	while(gr.next()) {
-        gs.log(gr.number + '\n');
-        gr.state = '4';
-        gr.update();
+   gr.addQuery('change_request', '1de0692d5fda011064d574a460069cbf'); //paste correct sysID
+   gr.addEncodedQuery('stateIN-5,1,2');
+   gr.orderBy('order');
+   gr.query();
+   gs.log('change task count is: ' + gr.getRowCount());
+   while(gr.next()) {
+       var date = new GlideDateTime();
+       var newdate = date.getDisplayValue();
+       gs.log(gr.number + '\n');
+       gs.log('new date is: ' + newdate);
+       gr.state = '4'; // 3 - closed , 4 - cancelled
+       gr.work_end = newdate;
+       gr.update();
 }
 
 
