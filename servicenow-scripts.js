@@ -209,6 +209,21 @@ function cancelCHANGE(){
 }
 
 
+///---------------------- RE-SSIGN CHANGE REQUEST TO A DIFFERENT ASSIGNMENT GROUP ---------------------------///
+
+var gr = new GlideRecord('change_request');
+gr.addQuery('sys_id', 'b05e5e47c7960d5064d56d04ef2279e9'); // Replace correct sys_id of the change you want to modify
+gr.query();
+if(gr.next()) {
+    var assignment_group = "b8d93d97c7de770064d5f293ef2279f2";
+    if (assignment_group) { // check on the specific assignment group
+        gr.assignment_group = "9abcae9bc74824d464d5f293ef2279a8"; // re-assign the assignment group
+        gr.setWorkflow(false); // Disables the running of BRs that might normally be triggered by subsequent actions
+        gr.update();
+    }
+}
+
+
 ///---------------------- CLOSE/CANCEL CTASK ---------------------------///
 
 closeCTASK();
