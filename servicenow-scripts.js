@@ -184,6 +184,19 @@ if(gr.next()) {
 }
 
 
+///---------------------- CLOSE/CANCEL INCIDENT ---------------------------///
+
+var gr = new GlideRecord('incident');
+    gr.addQuery('sys_id', 'b7e838f8bc43811064d59d2a941d0439'); // paste correct sys_id
+    gr.query();
+    if(gr.next()) {
+        gr.close_code = 'Closed/Resolved by Caller';
+        gr.close_notes = 'Issue has been resolved';
+        gr.state = '7'; //7 Closed 113 Cancelled
+        gr.update();
+    }
+
+
 ///---------------------- CLOSE/CANCEL CHANGE REQUEST ---------------------------///
  
 closeCHANGE();
