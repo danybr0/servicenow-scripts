@@ -175,13 +175,15 @@ var name = 'FPI Test Down Time 2';
 
 ///---------------------- CANCEL RITM / SRQ ---------------------------///
 
-var gr = new GlideRecord('sc_req_item');
-gr.addQuery('number', 'RITM0040224'); // ritm number
-gr.query();
-if(gr.next()) {
-	gr.state = '8';
-	gr.update();
-}
+var ReqItem = new GlideRecord('sc_req_item');
+    ReqItem.addQuery('sys_id', 'xxx'); // paste correct sys_id
+    ReqItem.query();
+    ReqItem.setWorkflow(false); // it will bypass BRs CS etc.
+    if(ReqItem.next()) {
+        ReqItem.close_notes = 'reason...';
+        ReqItem.state = '8'; //8 Closed Cancelled
+        ReqItem.update();
+    }
 
 
 ///---------------------- CLOSE/CANCEL INCIDENT ---------------------------///
