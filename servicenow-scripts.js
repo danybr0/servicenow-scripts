@@ -185,8 +185,100 @@ var ReqItem = new GlideRecord('sc_req_item');
         ReqItem.update();
     }
 
+///----- CANCEL BULK of RITMs along with the associated Catalog Tasks and Change Requests and their related Change Tasks ------///
 
-///---------------------- CLOSE/CANCEL INCIDENT ---------------------------///
+// I. query the Time
+// var time = new GlideDateTime();
+// var currentTime = time.getDisplayValue();
+// gs.print('new date is: ' + currentTime);
+
+var encQuery  = "active=true^numberLIKERITM0105056";// encoded query should be placed here
+// II. query the Request Items
+    var ReqItem = new GlideRecord('sc_req_item');
+        ReqItem.addEncodedQuery(encQuery);
+        ReqItem.query();
+        ReqItem.setWorkflow(false); // it will bypass BRs CS etc.
+        // ReqItem.autoSysFields(false); // will prevent your name from appearing that you perform this acction
+        gs.print('Request Items count = '+ ReqItem.getRowCount()); // check if the items numbers match with the SN table query 
+
+// III. loop through Request Items
+        while (ReqItem.next()) {
+            var ReqItemNum = ReqItem.getValue('number');
+            gs.print( ReqItemNum +' '+ ReqItem.number + ' ReqItem State before change = '+ ReqItem.state + ' New comment = ' + ReqItem.comments);
+
+// III.1 query the Cataog tasks associated to Request Items
+                var catTask = new GlideRecord('sc_task');
+                    catTask.addQuery('request_item.number', ReqItemNum);
+                    catTask.addEncodedQuery('stateIN-5,1,2,112');// query records only with states -5,1,2,112
+                    catTask.query();
+                    catTask.setWorkflow(false); // it will bypass BRs CS etc.
+                    // catTask.autoSysFields(false); // will prevent your name from appearing that you perform this acction
+                    gs.print(' catTask count = '+ catTask.getRowCount()); // check if the items numbers match with the SN table query  
+
+//III.1.2 make the amendment on the SCTASKs                    
+                       while (catTask.next()) {                                          
+                            gs.print(catTask.number + ' catTask State before change = '+ catTask.state + ' New comment = ' + catTask.comments);
+                            catTask.state = 8; // '8' for  Closed Cancelled
+                            // catTask.comments ='"Old request resolved in 2020, reopened due to issue in ServiceNow. Agreed to close and exclude." - RITM0102819';
+                            gs.print(catTask.number + ' catTask State after change = '+ catTask.state + ' New comment = ' + catTask.comments);
+                            catTask.update();
+                       }
+
+// III.2 query the Change Request associated to Request Items
+
+//III.2.1 query the Change Request 
+                    var chgReq = new GlideRecord('change_request');
+                        chgReq.addQuery('u_qs_requested_item.number', ReqItemNum);
+                        chgReq.orderBy('order');
+                        chgReq.query();
+                        chgReq.setWorkflow(false); // it will bypass BRs CS etc.
+                        // chgReq.autoSysFields(false); // will prevent your name from appearing that you perform this acction
+                        gs.print('chgReq count = '+ chgReq.getRowCount()); 
+                            while (chgReq.next()) {
+                                var chgReqNum = chgReq.getValue('number');
+                                gs.print( chgReq.number + ' chgReq State before change = '+ chgReq.state + ' New comment = ' + chgReq.comments);
+                                
+//III.2.1 query the Change task  associated to change Request 
+                                    var chgTask = new GlideRecord('change_task');
+                                        chgTask.addQuery('change_request.number',chgReqNum);
+                                        chgTask.addEncodedQuery('stateIN-5,1,2'); // query records only with states -5,1,2
+                                        chgTask.query();
+                                        // chgTask.autoSysFields(false); // will prevent your name from appearing that you perform this acction
+                                        var chgTaskNum = chgTask.getElement('number');
+                                        gs.print('chgTask count = '+ chgTask.getRowCount());
+
+//III.2.2 make the amendment on the CTASKs                                       
+                                            while (chgTask.next()) {
+                                                chgTask.setWorkflow(false); // it will bypass BRs CS etc.
+                                                gs.print(chgTaskNum + ' Ctask State before change = ' + chgTask.state);
+                                                var date = new GlideDateTime();
+                                                var newdate = date.getDisplayValue();
+                                                gs.log(chgTaskNum + '\n');
+                                                gs.log('new date is: ' + newdate);
+                                                chgTask.state = '4'; // 3 - closed , 4 - cancelled
+                                                chgTask.work_end = newdate;
+                                                chgTask.update();
+                                                gs.print(chgTaskNum + ' Ctask State after change = ' + chgTask.state);
+                                            }
+//III.2.3 make the amendment   on the change request items
+                                chgReq.setWorkflow(false);
+                                chgReq.state = 308; // '308' for Cancel
+                                // chgReq.comments = '"Old request resolved in 2020, reopened due to issue in ServiceNow. Agreed to close and exclude." - RITM0102819';
+                                chgReq.u_qs_closure_code = 3; // closure code set to cancelled
+                                // gs.print( chgReq.number + ' chgReq State after change = '+ chgReq.state + ' New comment = ' + chgReq.comments);
+                                chgReq.update();
+                                gs.print(chgReqNum + ' Change State after = '+ chgReq.state);
+                            }
+//IV.2.2 make the amendment   on the request items   
+            // ReqItem.comments = '"Old request resolved in 2020, reopened due to issue in ServiceNow. Agreed to close and exclude." - RITM0102819';
+            ReqItem.state = 8; // '8' for Closed Cancelled
+            gs.print(ReqItem.number + ' ReqItem State after change = '+ ReqItem.state + ' New comment = ' + ReqItem.comments);
+            ReqItem.update();                     
+             
+}
+
+
+///---------------------- CANCEL/CLOSE INCIDENT ---------------------------///
 
 var gr = new GlideRecord('incident');
     gr.addQuery('sys_id', 'b7e838f8bc43811064d59d2a941d0439'); // paste correct sys_id
@@ -199,7 +291,7 @@ var gr = new GlideRecord('incident');
     }
 
 
-///---------------------- CLOSE/CANCEL CHANGE REQUEST ---------------------------///
+///---------------------- CANCEL/CLOSE CHANGE REQUEST ---------------------------///
  
 closeCHANGE();
 function closeCHANGE(){
