@@ -181,7 +181,7 @@ var ReqItem = new GlideRecord('sc_req_item');
     ReqItem.setWorkflow(false); // it will bypass BRs CS etc.
     if(ReqItem.next()) {
         ReqItem.close_notes = 'reason...';
-        ReqItem.state = '8'; //8 Closed Cancelled
+        ReqItem.state = '9'; //8 Closed Cancelled / 9 Closed Incomplete
         ReqItem.update();
     }
 
@@ -271,7 +271,7 @@ var encQuery  = "active=true^numberLIKERITM0105056";// encoded query should be p
                             }
 //IV.2.2 make the amendment   on the request items   
             // ReqItem.comments = '"Old request resolved in 2020, reopened due to issue in ServiceNow. Agreed to close and exclude." - RITM0102819';
-            ReqItem.state = 8; // '8' for Closed Cancelled
+            ReqItem.state = '9'; //8 Closed Cancelled / 9 Closed Incomplete
             gs.print(ReqItem.number + ' ReqItem State after change = '+ ReqItem.state + ' New comment = ' + ReqItem.comments);
             ReqItem.update();                     
              
