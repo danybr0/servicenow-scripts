@@ -278,6 +278,70 @@ var encQuery  = "active=true^numberLIKERITM0105056";// encoded query should be p
 }
 
 
+///------ CANCEL bulk of Change Request along with their related Change Tasks -----///
+
+// 1st method
+
+var encQuery  = "INCHG0035377,CHG0045215,CHG0045272"; // encoded query should be placed here  
+
+var chgReq = new GlideRecord('change_request');  
+chgReq.addEncodedQuery(encQuery);  
+// chgReq.addQuery('sys_id', 'd84a163cb875911064d5a92a5dc149d5');
+chgReq.orderBy('order'); 
+chgReq.query();  
+gs.print('Change Request count = '+ chgReq.getRowCount());  
+    while (chgReq.next()) {  
+        var chgReqNum = chgReq.getValue('number') ;  
+        gs.print(chgReqNum + ' Change State before = '+ chgReq.state);  
+        var chgTask = new GlideRecord('change_task');  
+        chgTask.addQuery('change_request.number',chgReqNum);  
+        chgTask.addEncodedQuery('stateIN-5,1,2'); // query records only with states -5,1,2  
+        chgTask.orderBy('order');  
+        chgTask.query();  
+        gs.print('CTasks count = '+ chgTask.getRowCount());  
+        while (chgTask.next()) {  
+            // chgTask.setWorkflow(false);  
+            gs.print(chgTask.number + ' Ctask State before change = ' + chgTask.state);  
+            chgTask.state = '4'; // 3 - closed , 4 - cancelled  
+            chgTask.update();  
+            gs.print(chgTask.number + ' Ctask State after change = ' + chgTask.state);  
+        } 
+    // chgReq.state = '308'; // 308 cancelled  
+    // chgReq.update(); 
+    gs.print(chgReqNum + ' Change State after = '+ chgReq.state);
+}  
+
+// 2nd method 
+
+var encQuery  = "numberINCHG0124328"; // encoded query should be placed here  
+ 
+
+var chgReq = new GlideRecord('change_request');  
+chgReq.addEncodedQuery(encQuery);  
+chgReq.orderBy('order');  
+chgReq.query();  
+chgReq.setWorkflow(false); // allows you to make a comment 
+gs.print('Change Request count = '+ chgReq.getRowCount());  
+    while (chgReq.next()) {  
+        var chgReqNum = chgReq.getValue('number') ;  
+        gs.print(chgReqNum + ' Change State before = '+ chgReq.state);
+        var chgTask = new GlideRecord('change_task');
+                chgTask.addQuery('change_request.number',chgReqNum);
+                chgTask.addEncodedQuery('stateIN-5,1,2'); // query records only with states -5,1,2
+                chgTask.orderBy('order');
+                chgTask.query();
+                gs.print('CTasks count = '+ chgTask.getRowCount());
+                while (chgTask.next()) {  
+                    // chgTask.setWorkflow(false);
+                    gs.print(chgTask.number + ' Ctask State before change = ' + chgTask.state);
+                    chgTask.state = '4'; // 3 - closed , 4 - cancelled
+                    // chgTask.update();
+                    gs.print(chgTask.number + ' Ctask State after change = ' + chgTask.state);
+                }
+        gs.print(chgReqNum + ' Change State after = '+ chgReq.state);
+    }  
+
+
 ///---------------------- CANCEL/CLOSE INCIDENT ---------------------------///
 
 var gr = new GlideRecord('incident');
