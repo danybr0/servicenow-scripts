@@ -1,5 +1,8 @@
-// check whether user is a member of a particular group
+// return the sys_id of the currently logged in user 
+javascript:gs.getUserID();
 
+
+// check whether user is a member of a particular group
 var user = 'admin';
 var group = "Hardware";
 
