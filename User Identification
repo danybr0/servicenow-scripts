@@ -1,1 +1,11 @@
+// check whether user is a member of a particular group
 
+var user = 'admin';
+var group = "Hardware";
+
+if (gs.getUser().getUserByID(user).isMemberOf(group)){
+    gs.log(user + " is a member of " + group);
+}
+else{
+    gs.log(user + " is NOT a member of " + group);
+}
