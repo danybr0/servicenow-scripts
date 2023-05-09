@@ -2,13 +2,22 @@
 javascript:gs.getUserID();
 
 
-// check whether user is a member of a particular group
-var user = 'admin';
-var group = "Hardware";
-
-if (gs.getUser().getUserByID(user).isMemberOf(group)){
-    gs.log(user + " is a member of " + group);
+// check whether user is a MEMBER of a particular group
+var usr = gs.getUser(); //get object for specific user
+usr = usr.getUserByID('beth.anglin'); //instead of UserID it is possible to use the sys_id
+var group = 'Service Desk';
+if (usr.isMemberOf(group)) {
+    gs.log(usr.getName() + " is a member of " + group);
+} else {
+    gs.log(usr.getName() + " is NOT a member of " + group);
 }
-else{
-    gs.log(user + " is NOT a member of " + group);
+
+
+// check whether user has ITIL role
+var usr = gs.getUser(); //get object for specific user
+usr = usr.getUserByID('ATF.User'); //instead of UserID it is possible to use the sys_id
+if (usr.hasRole('itil')) {
+    gs.log(usr.getName() + " has an ITIL role");
+} else {
+    gs.log(usr.getName() + " has NOT an ITIL role");
 }
