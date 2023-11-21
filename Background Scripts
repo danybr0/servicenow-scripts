@@ -1,0 +1,15 @@
+// This script prints the names and sys_ids of the groups that contain the itil role in their roles field
+
+// get the sys_id of the itil role
+var itilRole = new GlideRecord ('sys_user_role');
+itilRole.get ('name', 'itil');
+gs.print ('Itil role sys_id: ' + itilRole.sys_id);
+
+// query the groups that have the itil role in their roles field
+var grGroup = new GlideRecord ('sys_user_group');
+grGroup.addQuery ('roles', '=', itilRole.sys_id);
+grGroup.query ();
+// loop through the groups and print their names and sys_ids
+while (grGroup.next ()) {
+  gs.print ('Group: ' + grGroup.name + ' | Sys_id: ' + grGroup.sys_id);
+}
