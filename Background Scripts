@@ -68,3 +68,7 @@ if (duplicateUserNames.length > 0) {
 } else {
     gs.info('No duplicate user names found.');
 }
+
+Reference: 
+
+https://snprotips.com/blog/rvicenowprotips.com/2015/12/detecting-duplicate-records-with.html
