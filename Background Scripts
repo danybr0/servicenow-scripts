@@ -1,4 +1,4 @@
-// This script prints the names and sys_ids of the groups that contain the itil role in their roles field
+//*** This script prints the names and sys_ids of the groups that contain the itil role in their roles field
 
 // get the sys_id of the itil role
 var itilRole = new GlideRecord ('sys_user_role');
@@ -12,4 +12,59 @@ grGroup.query ();
 // loop through the groups and print their names and sys_ids
 while (grGroup.next ()) {
   gs.print ('Group: ' + grGroup.name + ' | Sys_id: ' + grGroup.sys_id);
+}
+
+
+//*** This checks the number of duplicates for each user
+
+function getDupes(tableName, dupeField) {  
+    var q = new GlideAggregate(tableName); 
+    //q.addQuery('active', '=', 'true'); //returns only active records
+    q.addAggregate('COUNT', dupeField); //aggregate to count values in whatever field is passed as dupeField
+    q.addHaving('COUNT', dupeField, '>', '1'); //returns only records having more than one active instance of dupeField (duplicates)
+    q.groupBy(dupeField); // Group by the duplicate field to count duplicates for each value
+    q.query();  
+
+    var userDuplicateCount = {}; // Object to store user names and their duplicate counts
+
+    while (q.next()) {  
+        var userName = q.getValue(dupeField);
+        var duplicateCount = q.getAggregate('COUNT', dupeField);
+
+        // Store the user name and their duplicate count in the object
+        userDuplicateCount[userName] = duplicateCount;       
+    } 
+    return userDuplicateCount; 
+}
+
+var duplicateUserCounts = getDupes('sys_user', 'name');
+for (var userName in duplicateUserCounts) {
+    var duplicateCount = duplicateUserCounts[userName];
+    gs.info('User: ' + userName + ', Duplicate Count: ' + duplicateCount);
+}
+
+if (Object.keys(duplicateUserCounts).length === 0) {
+    gs.info('No duplicate user names found.');
+}
+
+//*** This script checks if duplicates exist without counting the number of duplicates
+
+function getDupes(tableName, dupeField) {  
+    var q = new GlideAggregate(tableName); 
+    //q.addQuery('active', '=', 'true'); //returns only active records
+    q.addAggregate('COUNT', dupeField); //aggregate to count values in whatever field is passed as dupeField
+    q.addHaving('COUNT', dupeField, '>', '1'); //returns only records having more than one active instance of dupeField (duplicates)
+    q.query();  
+    var listOfDupes = new Array(); //build an array to push the results into
+    while (q.next()) {  
+        listOfDupes.push(q.getValue(dupeField)); //Push the value of the dupe field to the array       
+    } 
+    return listOfDupes; 
+}
+
+var duplicateUserNames = getDupes('sys_user', 'name');
+if (duplicateUserNames.length > 0) {
+    gs.info('Duplicate User Names: ' + duplicateUserNames.join(', '));
+} else {
+    gs.info('No duplicate user names found.');
 }
