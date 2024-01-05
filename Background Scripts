@@ -72,3 +72,39 @@ if (duplicateUserNames.length > 0) {
 Reference: 
 
 https://snprotips.com/blog/rvicenowprotips.com/2015/12/detecting-duplicate-records-with.html
+
+
+//*** Attachment Checker
+
+var tableName = 'incident'; // Replace with your specific table name, e.g., 'incident'
+
+// Query the specified table
+var ticketRecord = new GlideRecord(tableName);
+ticketRecord.query();
+
+while (ticketRecord.next()) {
+    var ticketSysId = ticketRecord.getUniqueValue();
+    var attachment = new GlideSysAttachment();
+    var attachmentGR = attachment.getAttachments(tableName, ticketSysId);
+
+    // Check if the ticket has attachments
+    if (attachmentGR.hasNext()) {
+        gs.info('Ticket ' + ticketRecord.number + ' has the following attachments:');
+
+        while (attachmentGR.next()) {
+            gs.info(attachmentGR.getValue('file_name'));
+        }
+    } else {
+        gs.info('Ticket ' + ticketRecord.number + ' has no attachments.');
+    }
+}
+
+This script does the following:
+
+1) Iterates through each record in the specified table (like incidents, change requests, etc.).
+2) For each record, it checks if there are any attachments.
+3) If there are attachments, it logs the names of these attachments.
+
+Reference:
+
+https://docs.servicenow.com/bundle/vancouver-api-reference/page/app-store/dev_portal/API_reference/GlideSysAttachmentGlobal/concept/GlideSysAttachmentGlobalAPI.html
