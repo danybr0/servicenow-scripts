@@ -108,3 +108,51 @@ This script does the following:
 Reference:
 
 https://docs.servicenow.com/bundle/vancouver-api-reference/page/app-store/dev_portal/API_reference/GlideSysAttachmentGlobal/concept/GlideSysAttachmentGlobalAPI.html
+
+
+//*** This script finds incidents with time worked entries in ServiceNow
+
+(function() {
+    var incidentWithTimeWorked = {};
+
+    // Query the task_time_worked table for records related to incidents
+    var timeWorked = new GlideRecord('task_time_worked');
+    timeWorked.addQuery('task.sys_class_name', 'incident'); // Filter for incident class or task type
+    timeWorked.query();
+
+    while (timeWorked.next()) {
+        // Use the incident's sys_id as a key to track unique incidents
+        var incidentSysId = timeWorked.task.sys_id.toString();
+
+        // Check if this incident is already in the list
+        if (!incidentWithTimeWorked[incidentSysId]) {
+            incidentWithTimeWorked[incidentSysId] = {
+                number: '', // Placeholder for incident number
+                total_time: 0 // Placeholder for total time worked
+            };
+
+            // Retrieve incident number
+            var incidentGR = new GlideRecord('incident');
+            if (incidentGR.get(incidentSysId)) {
+                incidentWithTimeWorked[incidentSysId].number = incidentGR.getValue('number');
+            }
+        }
+
+        // Add time worked to the total for this incident
+        incidentWithTimeWorked[incidentSysId].total_time += parseInt(timeWorked.getValue('time_worked'), 10);
+    }
+
+    // Log the incidents with their total time worked
+    for (var id in incidentWithTimeWorked) {
+        if (incidentWithTimeWorked.hasOwnProperty(id)) {
+            var record = incidentWithTimeWorked[id];
+            gs.log('Incident ' + record.number + ' has ' + record.total_time + ' seconds of time worked.');
+        }
+    }
+})();
+
+This script does the following:
+
+1) It queries the task_time_worked table for entries related to incidents.
+2) It tracks unique incidents and sums up the time worked for each incident.
+3) It logs the incident number and the total time worked.
